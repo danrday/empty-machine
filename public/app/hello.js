@@ -13,6 +13,7 @@ Machine.cog({
         }
 
         let scene = new THREE.Scene()
+        let gui = new dat.GUI()
 
 
         let box = this.getBox(1,1,1)
@@ -26,6 +27,11 @@ Machine.cog({
         box.position.y = box.geometry.parameters.height/2
         plane.rotation.x = Math.PI/2
         pointLight.position.y = 1.5
+        pointLight.intensity = 2
+
+        gui.add(pointLight, 'intensity', 0, 10)
+        gui.add(pointLight.position, 'y', 0, 5)
+
 
         scene.add(box)
         scene.add(plane)
@@ -55,11 +61,13 @@ Machine.cog({
 
         document.getElementById('webgl').appendChild(renderer.domElement)
 
+        let controls = new THREE.OrbitControls(camera, renderer.domElement)
+
         // renderer.render(
         //     scene,
         //     camera
         // )
-        this.update(renderer, scene, camera)
+        this.update(renderer, scene, camera, controls)
 
         window.scene = scene
     },
@@ -92,7 +100,7 @@ Machine.cog({
 
         return mesh
     },
-    update(renderer, scene,camera) {
+    update(renderer, scene, camera, controls) {
         renderer.render(
             scene,
             camera
@@ -106,8 +114,10 @@ Machine.cog({
         //     child.scale.x += 0.001
         // })
 
+        controls.update()
+
         requestAnimationFrame(() => {
-            this.update(renderer, scene, camera)
+            this.update(renderer, scene, camera, controls)
         })
     },
     getPointLight(intensity) {
