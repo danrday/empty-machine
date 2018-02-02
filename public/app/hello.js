@@ -16,15 +16,19 @@ Machine.cog({
         let gui = new dat.GUI()
 
 
-        let box = this.getBox(1,1,1)
+        // let box = this.getBox(1,1,1)
+
+        let boxGrid = this.getBoxGrid(10, 1.5)
+
         let plane = this.getPlane(20)
         let pointLight = this.getPointLight(1)
         let sphere = this.getSphere(0.05)
 
         plane.name = 'plane-1'
-        box.name = 'box-1'
 
-        box.position.y = box.geometry.parameters.height/2
+        boxGrid.name = 'box-grid'
+
+        // box.position.y = box.geometry.parameters.height/2
         plane.rotation.x = Math.PI/2
         pointLight.position.y = 1.5
         pointLight.intensity = 2
@@ -33,9 +37,10 @@ Machine.cog({
         gui.add(pointLight.position, 'y', 0, 5)
 
 
-        scene.add(box)
+        // scene.add(box)
         scene.add(plane)
         scene.add(pointLight)
+        scene.add(boxGrid)
 
         pointLight.add(sphere)
 
@@ -90,7 +95,34 @@ Machine.cog({
 
         return mesh
     },
-    getPlane(size) {
+
+    getBoxGrid(amount, separationMultiplier) {
+    let self = this
+    var group = new THREE.Group();
+
+    for (var i=0; i<amount; i++) {
+        var obj = self.getBox(1, 1, 1);
+        obj.position.x = i * separationMultiplier;
+        obj.position.y = obj.geometry.parameters.height/2;
+        group.add(obj);
+        for (var j=1; j<amount; j++) {
+            var obj = self.getBox(1, 1, 1);
+            obj.position.x = i * separationMultiplier;
+            obj.position.y = obj.geometry.parameters.height/2;
+            obj.position.z = j * separationMultiplier;
+            group.add(obj);
+        }
+    }
+
+    group.position.x = -(separationMultiplier * (amount-1))/2;
+    group.position.z = -(separationMultiplier * (amount-1))/2;
+
+    return group;
+    },
+
+
+
+getPlane(size) {
         let geometry = new THREE.PlaneGeometry(size, size)
 
         let material = new THREE.MeshPhongMaterial({
@@ -112,9 +144,9 @@ Machine.cog({
             camera
         )
 
-        let box = scene.getObjectByName('box-1')
+        let box = scene.getObjectByName('box-grid')
         box.rotation.y += 0.031
-        box.rotation.z += 0.031
+        // box.rotation.z += 0.031
 
         // scene.traverse(function(child) {
         //     child.scale.x += 0.001
