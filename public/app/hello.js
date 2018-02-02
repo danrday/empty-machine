@@ -55,6 +55,9 @@ Machine.cog({
         camera.lookAt(new THREE.Vector3(0,0,0))
 
         let renderer = new THREE.WebGLRenderer()
+
+        renderer.shadowMap.enabled = true
+
         renderer.setSize(window.innerWidth, window.innerHeight)
 
         renderer.setClearColor('rgb(120,120,120)')
@@ -83,6 +86,8 @@ Machine.cog({
             material
         )
 
+        mesh.castShadow = true
+
         return mesh
     },
     getPlane(size) {
@@ -97,6 +102,7 @@ Machine.cog({
             geometry,
             material
         )
+        mesh.receiveShadow = true
 
         return mesh
     },
@@ -122,6 +128,7 @@ Machine.cog({
     },
     getPointLight(intensity) {
         let light = new THREE.PointLight(0xffffff, intensity)
+        light.castShadow = true
         return light
     },
     getSphere(size) {
