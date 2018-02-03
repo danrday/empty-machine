@@ -21,7 +21,7 @@ Machine.cog({
         let boxGrid = this.getBoxGrid(10, 1.5)
 
         let plane = this.getPlane(20)
-        let pointLight = this.getPointLight(1)
+        let spotLight = this.getSpotLight(1)
         let sphere = this.getSphere(0.05)
 
         plane.name = 'plane-1'
@@ -30,19 +30,19 @@ Machine.cog({
 
         // box.position.y = box.geometry.parameters.height/2
         plane.rotation.x = Math.PI/2
-        pointLight.position.y = 1.5
-        pointLight.intensity = 2
+        spotLight.position.y = 4
+        spotLight.intensity = 2
 
-        gui.add(pointLight, 'intensity', 0, 10)
-        gui.add(pointLight.position, 'y', 0, 5)
+        gui.add(spotLight, 'intensity', 0, 10)
+        gui.add(spotLight.position, 'y', 0, 5)
 
 
         // scene.add(box)
         scene.add(plane)
-        scene.add(pointLight)
+        scene.add(spotLight)
         scene.add(boxGrid)
 
-        pointLight.add(sphere)
+        spotLight.add(sphere)
 
         let camera = new THREE.PerspectiveCamera(
             45,
@@ -145,7 +145,7 @@ getPlane(size) {
         )
 
         let box = scene.getObjectByName('box-grid')
-        box.rotation.y += 0.031
+        box.rotation.y += 0.005
         // box.rotation.z += 0.031
 
         // scene.traverse(function(child) {
@@ -160,6 +160,11 @@ getPlane(size) {
     },
     getPointLight(intensity) {
         let light = new THREE.PointLight(0xffffff, intensity)
+        light.castShadow = true
+        return light
+    },
+    getSpotLight(intensity) {
+        let light = new THREE.SpotLight(0xffffff, intensity)
         light.castShadow = true
         return light
     },
