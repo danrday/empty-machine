@@ -59,18 +59,27 @@ Machine.cog({
 
        directionalLight.add(sphere)
 
-        let camera = new THREE.PerspectiveCamera(
-            45,
-            window.innerWidth/window.innerHeight,
+        // let camera = new THREE.PerspectiveCamera(
+        //     45,
+        //     window.innerWidth/window.innerHeight,
+        //     1,
+        //     1000
+        // )
+
+        let camera = new THREE.OrthographicCamera(
+            -15,
+            15,
+            15,
+            -15,
             1,
             1000
         )
 
-        camera.position.x = 1
+        camera.position.x = 10
 
-        camera.position.y = 2
+        camera.position.y = 18
 
-        camera.position.z = 5
+        camera.position.z = -18
 
         camera.lookAt(new THREE.Vector3(0,0,0))
 
