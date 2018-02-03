@@ -15,14 +15,20 @@ Machine.cog({
         let scene = new THREE.Scene()
         let gui = new dat.GUI()
 
+        let clock = new THREE.Clock()
+
 
         // let box = this.getBox(1,1,1)
 
         let boxGrid = this.getBoxGrid(10, 1.5)
 
         let plane = this.getPlane(20)
-        let spotLight = this.getSpotLight(1)
+        let directionalLight = this.getDirectionalLight(1)
         let sphere = this.getSphere(0.05)
+
+        let helper = new THREE.CameraHelper(directionalLight.shadow.camera)
+
+        let ambientLight = this.getAmbientLight(1)
 
         plane.name = 'plane-1'
 
@@ -30,19 +36,28 @@ Machine.cog({
 
         // box.position.y = box.geometry.parameters.height/2
         plane.rotation.x = Math.PI/2
-        spotLight.position.y = 4
-        spotLight.intensity = 2
+       directionalLight.position.x = 13
+       directionalLight.position.y = 10
+       directionalLight.position.z = 10
+       directionalLight.intensity = 2
 
-        gui.add(spotLight, 'intensity', 0, 10)
-        gui.add(spotLight.position, 'y', 0, 5)
+        gui.add(directionalLight, 'intensity', 0, 10)
+        gui.add(directionalLight.position, 'x', 0, 20)
+        gui.add(directionalLight.position, 'y', 0, 20)
+        gui.add(directionalLight.position, 'z', 0, 20)
+        gui.add(ambientLight, 'intensity', 1, 10)
+
+        // gui.add(directionalLight, 'penumbra', 0,1)
 
 
         // scene.add(box)
         scene.add(plane)
-        scene.add(spotLight)
+        scene.add(directionalLight)
         scene.add(boxGrid)
+        scene.add(helper)
+        scene.add(ambientLight)
 
-        spotLight.add(sphere)
+       directionalLight.add(sphere)
 
         let camera = new THREE.PerspectiveCamera(
             45,
@@ -75,7 +90,7 @@ Machine.cog({
         //     scene,
         //     camera
         // )
-        this.update(renderer, scene, camera, controls)
+        this.update(renderer, scene, camera, controls, clock)
 
         window.scene = scene
     },
@@ -138,14 +153,27 @@ getPlane(size) {
 
         return mesh
     },
-    update(renderer, scene, camera, controls) {
+    update(renderer, scene, camera, controls, clock) {
         renderer.render(
             scene,
             camera
         )
 
         let box = scene.getObjectByName('box-grid')
-        box.rotation.y += 0.005
+
+        let timeElapsed = clock.getElapsedTime()
+
+
+        box.children.forEach(function(child, index) {
+
+            let x = timeElapsed * 5 + index
+
+            child.scale.y = (noise.simplex2(x, x) + 1) / 2 + 0.001
+            child.position.y = child.scale.y/2
+        })
+
+
+        // box.rotation.y += 0.005
         // box.rotation.z += 0.031
 
         // scene.traverse(function(child) {
@@ -155,7 +183,7 @@ getPlane(size) {
         controls.update()
 
         requestAnimationFrame(() => {
-            this.update(renderer, scene, camera, controls)
+            this.update(renderer, scene, camera, controls, clock)
         })
     },
     getPointLight(intensity) {
@@ -163,9 +191,33 @@ getPlane(size) {
         light.castShadow = true
         return light
     },
+    getAmbientLight(intensity) {
+        let light = new THREE.AmbientLight('rgb(10,30,50)', intensity)
+        return light
+    },
     getSpotLight(intensity) {
         let light = new THREE.SpotLight(0xffffff, intensity)
         light.castShadow = true
+
+        // remove shadow glitches
+        light.shadow.bias = 0.001
+
+        light.shadow.mapSize.width = 2048
+        light.shadow.mapSize.height = 2048
+
+
+        return light
+    },
+    getDirectionalLight(intensity) {
+        let light = new THREE.DirectionalLight(0xffffff, intensity)
+        light.castShadow = true
+
+        light.shadow.camera.left = -10
+        light.shadow.camera.bottom = -10
+        light.shadow.camera.right = 10
+        light.shadow.camera.top = 10
+
+
         return light
     },
     getSphere(size) {
